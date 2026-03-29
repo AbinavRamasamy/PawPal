@@ -29,6 +29,11 @@ with st.sidebar:
         selected_owner_name, selected_pet, active_scheduler = None, None, None
         st.info("No owners yet. Create one below.")
 
+    st.divider()
+    st.subheader("View options")
+    sort_mode = st.radio("Sort tasks by", ["Priority", "Time"])
+    status_filter = st.selectbox("Show tasks", ["All", "Pending", "Completed"])
+
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
 st.title("🐾 PawPal+")
@@ -109,18 +114,49 @@ if st.button("Add task"):
         active_scheduler.add_task(task)
 
 if active_scheduler and active_scheduler.tasks:
-    st.write("Current tasks:")
-    for i, t in enumerate(active_scheduler.tasks):
-        col_a, col_b, col_c, col_d, col_e = st.columns([3, 2, 2, 2, 2])
-        col_a.write(t.name)
-        col_b.write(f"{t.duration} min")
-        col_c.write(t.priority)
-        col_d.write(t.recurrence or "—")
-        if t.completed:
-            col_e.write("✓ done")
-        elif col_e.button("Complete", key=f"complete_{selected_pet_name}_{i}"):
-            t.mark_complete()
-            st.rerun()
+    # ── apply sort ────────────────────────────────────────────────────────────
+    if sort_mode == "Time":
+        display_tasks = active_scheduler.sort_by_time()
+    else:
+        priority_order = {"high": 0, "medium": 1, "low": 2}
+        display_tasks = sorted(active_scheduler.tasks, key=lambda t: priority_order.get(t.priority, 99))
+
+    # ── apply filter ──────────────────────────────────────────────────────────
+    if status_filter == "Pending":
+        display_tasks = [t for t in display_tasks if not t.completed]
+    elif status_filter == "Completed":
+        display_tasks = [t for t in display_tasks if t.completed]
+
+    # ── summary metrics ───────────────────────────────────────────────────────
+    total   = len(active_scheduler.tasks)
+    pending = sum(1 for t in active_scheduler.tasks if not t.completed)
+    done    = total - pending
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total tasks",     total)
+    m2.metric("Pending",         pending)
+    m3.metric("Completed today", done)
+
+    # ── priority badge helper ─────────────────────────────────────────────────
+    badge = {"high": "🔴 high", "medium": "🟡 medium", "low": "🟢 low"}
+
+    # ── task rows ─────────────────────────────────────────────────────────────
+    if display_tasks:
+        st.write("")
+        for i, t in enumerate(display_tasks):
+            real_index = active_scheduler.tasks.index(t)
+            col_a, col_b, col_c, col_d, col_e = st.columns([3, 2, 2, 2, 2])
+            col_a.write(f"**{t.name}**")
+            col_b.write(f"{t.time} · {t.duration} min")
+            col_c.write(badge.get(t.priority, t.priority))
+            col_d.write(t.recurrence or "—")
+            if t.completed:
+                col_e.success("✓ done")
+            elif col_e.button("Complete", key=f"complete_{selected_pet_name}_{real_index}"):
+                t.mark_complete()
+                st.rerun()
+    else:
+        st.info(f"No {status_filter.lower()} tasks to show.")
+
 elif active_scheduler:
     st.info("No tasks yet. Add one above.")
 else:
@@ -139,22 +175,13 @@ col_gen, col_day = st.columns(2)
 with col_gen:
     if st.button("Generate schedule"):
         if active_scheduler is None:
-            st.warning("Select an owner and pet from the sidebar first.")
+            st.session_state.schedule_result = {"error": "Select an owner and pet from the sidebar first."}
         else:
-            budget_warn = active_scheduler.check_conflicts()
-            if budget_warn:
-                st.warning(budget_warn)
-            for w in active_scheduler.detect_time_conflicts():
-                st.warning(w)
-            schedule = active_scheduler.generate_schedule()
-            if not schedule:
-                st.info("No pending tasks to schedule.")
-            else:
-                st.success("Schedule (sorted by priority):")
-                st.table([
-                    {"name": t.name, "duration (min)": t.duration, "priority": t.priority, "recurrence": t.recurrence or "—"}
-                    for t in schedule
-                ])
+            st.session_state.schedule_result = {
+                "budget_warn":      active_scheduler.check_conflicts(),
+                "time_warnings":    active_scheduler.detect_time_conflicts(),
+                "schedule":         active_scheduler.generate_schedule(),
+            }
 
 with col_day:
     if st.button("Start New Day"):
@@ -163,5 +190,26 @@ with col_day:
         else:
             active_scheduler.reset_for_new_day()
             selected_pet.tasks = list(active_scheduler.tasks)
+            st.session_state.pop("schedule_result", None)
             st.success("New day started. Recurring tasks reset, one-time tasks cleared.")
             st.rerun()
+
+# ── full-width schedule output ────────────────────────────────────────────────
+result = st.session_state.get("schedule_result")
+if result:
+    if "error" in result:
+        st.warning(result["error"])
+    else:
+        if result["budget_warn"]:
+            st.warning(result["budget_warn"])
+        for w in result["time_warnings"]:
+            st.warning(w)
+        schedule = result["schedule"]
+        if not schedule:
+            st.info("No pending tasks to schedule.")
+        else:
+            st.success("Schedule (sorted by priority):")
+            st.table([
+                {"name": t.name, "time": t.time, "duration (min)": t.duration, "priority": t.priority, "recurrence": t.recurrence or "—"}
+                for t in schedule
+            ])

@@ -43,7 +43,26 @@ pip install -r requirements.txt
 7. Refine UML so it matches what you actually built.
 
 
+## Demo
+
+![Project Screenshot](./assets/project_screenshot.png)
+
+---
+
+## Features
+
+- **Owner and pet management** — create multiple owners, each with one or more pets tracked independently.
+- **Task creation** — add tasks with a name, duration, priority, scheduled start time, and recurrence type.
+- **Priority-sorted scheduling** — generate a daily plan that orders pending tasks from high to low priority.
+- **Live status dashboard** — see a running count of total, pending, and completed tasks at a glance.
+- **Flexible task views** — switch between sorting by priority or by time, and filter to pending or completed tasks only.
+
+For advanced scheduling algorithms, see [Smarter Scheduling](#smarter-scheduling) below.
+
+---
+
 ### Smarter Scheduling
+
 - **Mark tasks complete** — check off tasks as you finish them throughout the day.
 - **Daily time budget** — set how many minutes you have available and get a warning if your tasks add up to more than that.
 - **Conflict detection** — get alerted if two tasks are scheduled at overlapping times.
