@@ -41,3 +41,13 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+### Smarter Scheduling
+- **Mark tasks complete** — check off tasks as you finish them throughout the day.
+- **Daily time budget** — set how many minutes you have available and get a warning if your tasks add up to more than that.
+- **Conflict detection** — get alerted if two tasks are scheduled at overlapping times.
+- **Recurring tasks** — mark tasks as daily or weekly so they automatically come back the next day or next week.
+- **Sort by time** — view your tasks in the order they happen throughout the day.
+- **Filter tasks** — narrow your view by whether tasks are done or still pending, or by which pet they belong to.
+- **Multiple owners and pets** — manage care plans for several pets across different owners, all in one place.
+

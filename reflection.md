@@ -20,15 +20,17 @@ N/A
 ## 2. Scheduling Logic and Tradeoffs
 **a. Constraints and priorities**
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+My scheduler considers priority (high/medium/low), scheduled start time (HH:MM), task duration, a daily time budget, and recurrence (daily/weekly). It also detects time conflicts when two tasks' windows overlap.
 
 - How did you decide which constraints mattered most?
-
+I decided that priority mattered most because a pet owner with limited time needs to know which tasks are non-negotiable (e.g., feeding, medication) before optional ones (e.g., grooming). Time budget came second because it shows overcommitment before the day starts, giving the owner a chance to reschedule rather than discover the problem mid-day.
 
 **b. Tradeoffs**
 - Describe one tradeoff your scheduler makes.
+One tradeoff my scheduler makes is that it sorts by priority but does not automatically resolve time conflicts — it warns about them but gives no way to truly reorganize them. To overcome any time conflict, the user needs to mark a task as complete and remake the task and change the time slot.
 
 - Why is that tradeoff reasonable for this scenario?
-
+This tradeoff is reasonable because automatically rescheduling tasks would require knowing the owner's availability and preferences, which the system does not have. A warning gives the owner full control over how to resolve the conflict rather than silently moving tasks they may have intentionally placed at a specific time.
 ---
 
 ## 3. AI Collaboration
