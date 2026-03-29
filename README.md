@@ -42,6 +42,7 @@ pip install -r requirements.txt
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
 
+
 ### Smarter Scheduling
 - **Mark tasks complete** — check off tasks as you finish them throughout the day.
 - **Daily time budget** — set how many minutes you have available and get a warning if your tasks add up to more than that.
@@ -50,4 +51,18 @@ pip install -r requirements.txt
 - **Sort by time** — view your tasks in the order they happen throughout the day.
 - **Filter tasks** — narrow your view by whether tasks are done or still pending, or by which pet they belong to.
 - **Multiple owners and pets** — manage care plans for several pets across different owners, all in one place.
+
+### Testing PawPal+
+```bash
+python -m pytest tests/test_pawpal.py -v
+```
+
+The tests cover:
+- **Task completion** — verifying that marking a task done actually changes its status.
+- **Pet task count** — confirming that adding a task to a pet increases its task list.
+- **Sorting correctness** — ensuring tasks are returned in chronological order by start time.
+- **Recurrence logic** — confirming that a completed daily task becomes active again the next day, and that one-time tasks are removed after reset.
+- **Conflict detection** — verifying that tasks scheduled at the same time trigger a warning, and that well-spaced tasks do not.
+
+**Confidence level: ★★★★☆ (4/5)**
 
