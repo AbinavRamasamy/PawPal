@@ -11,9 +11,10 @@ I included Owner (to store user details and link to their pets), Pet (to hold sp
 
 **b. Design changes**
 - Did your design change during implementation?
+My design did not change during implementation, as all of the classes in pawpal_system.py has the inital attributes and methods I intended them to have.
 
 - If yes, describe at least one change and why you made it.
-
+N/A
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
